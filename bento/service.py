@@ -1,39 +1,12 @@
+import os
+import pickle
+
+import boto3
 import numpy as np
 from bentoml import env, artifacts, api, BentoService
 from bentoml.adapters import JsonInput
 from bentoml.artifact import SklearnModelArtifact
-from sklearn import datasets, linear_model
 
-
-# from ..train.train import get_data, train_model
-
-# had to copy this from the train script, because either we build the training module
-# along with the service code, or we copy the functions as standalone
-
-def get_data():
-    diabetes_X, diabetes_y = datasets.load_diabetes(return_X_y=True)
-    diabetes_X_train = diabetes_X[:-20]
-    diabetes_X_test  = diabetes_X[-20:]
-    diabetes_y_train = diabetes_y[:-20]
-    diabetes_y_test  = diabetes_y[-20:]
-
-    # pickle.dump(diabetes_X_test[2], open('test.pkl', 'wb'))
-    return diabetes_X_train, diabetes_X_test, diabetes_y_train, diabetes_y_test
-
-
-def train_model(x_train, x_test, y_train, y_test):
-    regr = linear_model.LinearRegression()
-    regr.fit(x_train, y_train)
-
-    # The mean square error
-    print(f'Mean square error: {np.mean((regr.predict(x_test) - y_test)**2)}')
-
-    # Explained variance score: 1 is perfect prediction
-    # and 0 means that there is no linear relationship
-    # between X and y.
-    print(f'Sample score: {regr.score(x_test, y_test)}')
-
-    return regr
 
 # dependency thing: https://github.com/bentoml/BentoML/issues/984
 @env(conda_channels=["conda-forge"], conda_dependencies=["ruamel.yaml"], auto_pip_dependencies=True)
@@ -47,9 +20,10 @@ class DiabetesRegressor(BentoService):
 
         # also, parsed json has a list of parsed inputs!
         # https://docs.bentoml.org/en/latest/api/adapters.html?highlight=JsonInput#bentoml.adapters.JsonInput
+        # this means that if you are NOT doing batched input, you need to send exactly one input and force to [0]
 
-        # todo: fix whatever's going on with this input
-        return self.artifacts.scikit_model.predict(np.array(j['input']) for j in parsed_json)
+        inp_data = np.array(parsed_json[0]['input'])
+        return self.artifacts.scikit_model.predict(inp_data)
 
 
 if __name__ == "__main__":
@@ -59,8 +33,12 @@ if __name__ == "__main__":
     2. run  `python -m ml-infer.bento.service ml-infer/bento/service.py`  
     """
 
-    x_train, x_test, y_train, y_test = get_data()
-    model = train_model(x_train, x_test, y_train, y_test)
+    client = boto3.client('s3')
+    # model is downloaded to the key name
+    model_location = os.environ['S3_MODEL_BUCKET']
+    model_key = os.environ['S3_MODEL_KEY']
+    client.download_file(model_location, model_key, model_key)
+    model = pickle.load(open(model_key, 'rb'))
 
     service = DiabetesRegressor()
     service.pack('scikit_model', model)

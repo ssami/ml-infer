@@ -13,7 +13,6 @@ def get_data():
     diabetes_y_train = diabetes_y[:-20]
     diabetes_y_test  = diabetes_y[-20:]
 
-    pickle.dump(diabetes_X_test[2], open('test.pkl', 'wb'))
     return diabetes_X_train, diabetes_X_test, diabetes_y_train, diabetes_y_test
 
 
