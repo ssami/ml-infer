@@ -81,12 +81,5 @@ docker run -p 5000:5000 410318598490.dkr.ecr.us-east-1.amazonaws.com/diabetes_re
 ```
 Saved path looks like `<relative path> / DiabetesRegressor/20200820161343_2F0AA9`
 
-Something is still failing in the way I'm sending input: 
-```
-ValueError: Expected 2D array, got scalar array instead:
-array=<generator object DiabetesRegressor.predict.<locals>.<genexpr> at 0x7f0041854660>.
-Reshape your data either using array.reshape(-1, 1) if your data has a single feature or array.reshape(1, -1) if it contains a single sample. 
-```
-
 Why doesn't BentoML use Numpy inputs? Why Pandas Dataframe only? DFs are significantly heavier. Issue is open against BentoML
 right now to do exactly that. 
