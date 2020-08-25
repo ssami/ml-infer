@@ -83,3 +83,8 @@ Saved path looks like `<relative path> / DiabetesRegressor/20200820161343_2F0AA9
 
 Why doesn't BentoML use Numpy inputs? Why Pandas Dataframe only? DFs are significantly heavier. Issue is open against BentoML
 right now to do exactly that. 
+
+Deployment can be done with ECS cluster; steps outlined here: https://docs.bentoml.org/en/latest/deployment/aws_ecs.html
+
+TBH these steps are as convoluted as AWS makes them (also -- where is the load balancer?) -- the only thing BentoML really provides is the Docker container build. 
+For instance, I wouldn't resort to using BentoML to replace our TF and CFN CI/CD deployment process. 
