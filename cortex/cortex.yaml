@@ -1,0 +1,15 @@
+- name: genre-detection
+  kind: RealtimeAPI
+  predictor:
+    type: python
+    path: predictor.py
+    config:
+      model_location: s3://1577132529/diabetes_regression.pkl
+    env:
+      AWS_ACCESS_KEY_ID: XXXX
+      AWS_SECRET_ACCESS_KEY: XXXX
+      AWS_DEFAULT_REGION: us-east-1
+  compute:
+    cpu: 1
+    mem: 1G
+
