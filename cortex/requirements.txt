@@ -1,1 +1,2 @@
-cortex==0.11
+# to install cortex, do
+# bash -c "$(curl -sS https://raw.githubusercontent.com/cortexlabs/cortex/master/get-cli.sh)"

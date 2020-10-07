@@ -1,4 +1,4 @@
-- name: genre-detection
+- name: diabetes-predictor
   kind: RealtimeAPI
   predictor:
     type: python
